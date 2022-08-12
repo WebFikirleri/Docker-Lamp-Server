@@ -8,6 +8,9 @@ Docker Apache PHP MariaDB server with docker compose.
     git clone https://github.com/WebFikirleri/Docker-Lamp-Server.git server
 
 #### Edit environments to cusomize server details
+
+Rename or copy ".env.sample" file as ".env" and edit it a text editor.
+
 For Linux:
 
     cp .env.sample .env
