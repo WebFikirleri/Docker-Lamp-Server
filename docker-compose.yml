@@ -6,10 +6,10 @@ services:
     restart: always
     environment:
       - ALLOW_EMPTY_PASSWORD=no
-      - MARIADB_USER=dbadmin
-      - MARIADB_PASSWORD=1qa2ws3ed4rf
-      - MARIADB_ROOT_PASSWORD=1qa2ws3ed4rf
-      - MARIADB_DATABASE=pdks
+      - MARIADB_USER=username
+      - MARIADB_PASSWORD=password
+      - MARIADB_ROOT_PASSWORD=password
+      - MARIADB_DATABASE=db
     ports:
       - '3309:3309'
     volumes:
@@ -28,9 +28,9 @@ services:
     depends_on:
       - mariadb
       
-  pdks-fe:
+  frontend:
     image: php:8.1-apache-buster
-    container_name: pdks-fe
+    container_name: frontend
     restart: always
     ports:
       - 80:80
@@ -41,10 +41,6 @@ services:
       - mariadb
     links:
       - mariadb
-    environment:
-      - http_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
-      - https_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
-      - ftp_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
     command: >
       bash -c 
       "apt-get -y update && 
@@ -54,9 +50,9 @@ services:
       docker-php-ext-install mysqli && 
       apache2-foreground"
       
-  pdks-be:
+  backend:
     image: php:7.4.30-apache-buster
-    container_name: pdks-be
+    container_name: backend
     restart: always
     ports:
       - 8082:80
@@ -66,10 +62,6 @@ services:
       - mariadb
     links:
       - mariadb
-    environment:
-      - http_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
-      - https_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
-      - ftp_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
     command: >
       bash -c 
       "apt-get -y update && 
