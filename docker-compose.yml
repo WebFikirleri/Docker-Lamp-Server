@@ -6,10 +6,10 @@ services:
     restart: always
     environment:
       - ALLOW_EMPTY_PASSWORD=no
-      - MARIADB_USER=$DBUSER
-      - MARIADB_PASSWORD=$DBPASS
-      - MARIADB_ROOT_PASSWORD=$DBROOTPASS
-      - MARIADB_DATABASE=$DBNAME
+      - MARIADB_USER=dbadmin
+      - MARIADB_PASSWORD=1qa2ws3ed4rf
+      - MARIADB_ROOT_PASSWORD=1qa2ws3ed4rf
+      - MARIADB_DATABASE=pdks
     ports:
       - '3309:3309'
     volumes:
@@ -21,26 +21,30 @@ services:
     restart: always
     environment:
       - PMA_HOST=mariadb
-      - UPLOAD_LIMIT=20480000
+      - UPLOAD_LIMIT=204800000
       - MAX_EXECUTION_TIME=1200
     ports:
       - '8090:80'
     depends_on:
       - mariadb
       
-  frontend:
-    image: php:${PHPVER_FRONTEND}-apache-buster
-    container_name: www-fe
+  pdks-fe:
+    image: php:8.1-apache-buster
+    container_name: pdks-fe
     restart: always
     ports:
       - 80:80
       - 443:443
     volumes:
-      - '$BASEDIR/www/frontend:/var/www/html'
+      - '$BASEDIR/www/pdks-frontend:/var/www/html'
     depends_on:
       - mariadb
     links:
       - mariadb
+    environment:
+      - http_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
+      - https_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
+      - ftp_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
     command: >
       bash -c 
       "apt-get -y update && 
@@ -48,21 +52,24 @@ services:
       docker-php-ext-configure intl && 
       docker-php-ext-install intl && 
       docker-php-ext-install mysqli && 
-      service apache2 restart &&
-      php -a"
+      apache2-foreground"
       
-  backend:
-    image: php:${PHPVER_BACKEND}-apache-buster
-    container_name: www-be
+  pdks-be:
+    image: php:7.4.30-apache-buster
+    container_name: pdks-be
     restart: always
     ports:
       - 8082:80
     volumes:
-      - '$BASEDIR/www/backend:/var/www/html'
+      - '$BASEDIR/www/pdks-backend:/var/www/html'
     depends_on:
       - mariadb
     links:
       - mariadb
+    environment:
+      - http_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
+      - https_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
+      - ftp_proxy=http://makdeniz2:$SGKPASS@proxy.sgk.intra:80
     command: >
       bash -c 
       "apt-get -y update && 
@@ -70,5 +77,4 @@ services:
       docker-php-ext-configure intl && 
       docker-php-ext-install intl && 
       docker-php-ext-install mysqli && 
-      service apache2 restart &&
-      php -a"
+      apache2-foreground"
